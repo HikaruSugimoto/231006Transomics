@@ -152,13 +152,24 @@ if selected_option=="A, gene regulatory network (including TF, miRNA, and mRNA) 
         Name=pd.read_csv("./Database/230228Molecule2Name.csv")
         miRNA=pd.read_csv("./Database/230424mmu_miRNA_Gene.csv")
         miRNA=miRNA.drop_duplicates(subset=['Name', 'miRNA'])
-        Scores=pd.concat([pd.read_csv("./Database/230228ChipScore1.csv", dtype="int16"),
-                pd.read_csv("./Database/230228ChipScore2.csv", dtype="int16"),
-                pd.read_csv("./Database/230228ChipScore3.csv", dtype="int16"),
-                pd.read_csv("./Database/230228ChipScore4.csv", dtype="int16"),
-                pd.read_csv("./Database/230228ChipScore5.csv", dtype="int16"),
-                pd.read_csv("./Database/230228ChipScore6.csv", dtype="int16")],axis=0).reset_index(drop=True)
-        Scores=pd.concat([pd.read_csv("./Database/230228Genename.csv"),Scores],axis=1)               
+        #Scores=pd.concat([pd.read_csv("./Database/230228ChipScore1.csv", dtype="int16"),
+        #        pd.read_csv("./Database/230228ChipScore2.csv", dtype="int16"),
+        #        pd.read_csv("./Database/230228ChipScore3.csv", dtype="int16"),
+        #        pd.read_csv("./Database/230228ChipScore4.csv", dtype="int16"),
+        #        pd.read_csv("./Database/230228ChipScore5.csv", dtype="int16"),
+        #        pd.read_csv("./Database/230228ChipScore6.csv", dtype="int16")],axis=0).reset_index(drop=True)
+        #Scores=pd.concat([pd.read_csv("./Database/230228Genename.csv"),Scores],axis=1)
+        @st.cache_data
+        def TFmiRNA_estimation():
+            Scores=pd.concat([pd.read_csv("./Database/230228ChipScore1.csv", dtype="int16"),
+                    pd.read_csv("./Database/230228ChipScore2.csv", dtype="int16"),
+                    pd.read_csv("./Database/230228ChipScore3.csv", dtype="int16"),
+                    pd.read_csv("./Database/230228ChipScore4.csv", dtype="int16"),
+                    pd.read_csv("./Database/230228ChipScore5.csv", dtype="int16"),
+                    pd.read_csv("./Database/230228ChipScore6.csv", dtype="int16")],axis=0).reset_index(drop=True)
+            Scores=pd.concat([pd.read_csv("./Database/230228Genename.csv"),Scores],axis=1)   
+            return Scores
+        Scores=TFmiRNA_estimation()          
         exp=pd.read_csv("./Database/230228experimentList_mm10.csv")[["Var4","Var5"]]
         TF=pd.read_csv("./Database/230228TF.csv")
         
