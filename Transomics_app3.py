@@ -105,7 +105,7 @@ options = ['cyan','blue','green','red','magenta','yellow','black','white']
 Inc_color = st.sidebar.selectbox('Increased color:',options)
 options = ['red','blue','green','cyan','magenta','yellow','black','white']
 Dec_color = st.sidebar.selectbox('Decreased color:',options)
-options1 = ['Liver', 'Muscle','All', 'Pluripotent stem cell', 'Unclassified', 'Blood', 'Embryo',
+options1 = ['Liver', 'Muscle','Pluripotent stem cell', 'Unclassified', 'Blood', 'Embryo',
        'Gonad', 'No description', 'Neural','Embryonic fibroblast', 'Digestive tract', 'Kidney',
        'Cardiovascular', 'Pancreas', 'Lung', 'Spleen', 'Bone','Others', 'Uterus', 'Breast', 
        'Epidermis', 'Prostate', 'Adipocyte','Placenta']
