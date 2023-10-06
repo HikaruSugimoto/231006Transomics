@@ -235,6 +235,7 @@ if selected_option=="A, gene regulatory network (including TF, miRNA, and mRNA) 
         Q3_Down=P[P[0]<FDR][['TF', 'p','list',0]].rename(columns={0: 'Q'})
         
         del Scores
+        del exp
         gc.collect()
         #TF
         Q3_UP["Regulation"]="UP"
@@ -265,6 +266,9 @@ if selected_option=="A, gene regulatory network (including TF, miRNA, and mRNA) 
                             TFmiRNAmRNAcopy.to_csv(index=False))
         with open("TFmiRNA-mRNA.zip", "rb") as file: 
             st.download_button(label = "Download TFmiRNA-mRNA data",data = file,file_name = "TFmiRNA-mRNA.zip")        
+        
+        del TFmiRNAmRNAcopy
+        gc.collect()
         #Network
         fig = plt.figure(figsize=(12,8),facecolor='black')
         ax1 = fig.add_subplot(111, projection='3d')
@@ -360,7 +364,6 @@ if selected_option=="A, gene regulatory network (including TF, miRNA, and mRNA) 
         components.html(HtmlFile.read(), height=900)
         st.download_button(label="Download the interactice network",data=open("TFmiRNA-mRNA.html", 'r'),
                         file_name="TFmiRNA-mRNA.html")
-        del TFmiRNAmRNAcopy
         del TFmiRNAmRNA
         del TFmiRNAmRNA1
         gc.collect()  
@@ -376,12 +379,10 @@ if selected_option=="B, mRNA (protein)-mRNA (protein) interaction (transcriptome
         PPI=pd.read_csv("./Database/230228String400_2.csv")
         Gene2Protein=pd.read_csv("./Database/230228Gene2Protein.csv")
         #Output
-        Tran=pd.merge(Tran, Name.rename(columns={'Molecule': 'ENSMUSG'}), on='ENSMUSG', how='inner')
+        Tran=pd.merge(Tran, Name.rename(columns={'Molecule': 'ENSMUSG'}), on='ENSMUSG', how='inner',copy=False)
         DEP=pd.merge(Tran, Gene2Protein, on='ENSMUSG', how='inner')
-        DEP1=DEP.rename(columns={'ENSMUSP': 'protein1'})
-        DEP2=pd.merge(DEP1, PPI, on='protein1', how='inner')
-        DEP1=DEP.rename(columns={'ENSMUSP': 'protein2'})
-        DEP3=pd.merge(DEP2, DEP1, on='protein2', how='inner')
+        DEP2=pd.merge(DEP.rename(columns={'ENSMUSP': 'protein1'}), PPI, on='protein1', how='inner',copy=False)
+        DEP3=pd.merge(DEP2, DEP.rename(columns={'ENSMUSP': 'protein2'}), on='protein2', how='inner',copy=False)
         DEP_UP=DEP3[(DEP3['FC_x'] =="UP") & (DEP3['FC_y'] =="UP")]
         DEP_Down=DEP3[(DEP3['FC_x'] =="Down") & (DEP3['FC_y'] =="Down")]
 
@@ -396,7 +397,10 @@ if selected_option=="B, mRNA (protein)-mRNA (protein) interaction (transcriptome
         Pk10=pd.DataFrame([x1,y1]).T.rename(columns={0: 'k'}).rename(columns={1: 'P(k)'})
         Pk11=Pk10[Pk10["k"]>0]
         Pk12=Pk11[Pk11["P(k)"]>0]
-
+        
+        del DEP3
+        del PPI
+        gc.collect()
         #Network_UP
         G = nx.Graph()
         G.add_nodes_from(DEP_UP["Name_x"].unique(), bipartite=0)
@@ -609,8 +613,6 @@ if selected_option=="B, mRNA (protein)-mRNA (protein) interaction (transcriptome
                             Decreased_output.to_csv(index=True))                
         with open("mRNA-mRNA.zip", "rb") as file: 
             st.download_button(label = "Download mRNA-mRNA data",data = file,file_name = "mRNA-mRNA.zip")
-        del PPI
-        gc.collect()
             
     if Pro is not None:
         st.subheader('B, Protein-protein interaction')
@@ -619,11 +621,9 @@ if selected_option=="B, mRNA (protein)-mRNA (protein) interaction (transcriptome
         PPI=pd.read_csv("./Database/230228String400_2.csv")
         #Gene2Protein=pd.read_csv("./Database/230228Gene2Protein.csv")
         #Output
-        DEP=pd.merge(Pro, Name.rename(columns={'Molecule': 'ENSMUSP'}), on='ENSMUSP', how='inner')
-        DEP1=DEP.rename(columns={'ENSMUSP': 'protein1'})
-        DEP2=pd.merge(DEP1, PPI, on='protein1', how='inner')
-        DEP1=DEP.rename(columns={'ENSMUSP': 'protein2'})
-        DEP3=pd.merge(DEP2, DEP1, on='protein2', how='inner')
+        DEP=pd.merge(Pro, Name.rename(columns={'Molecule': 'ENSMUSP'}), on='ENSMUSP', how='inner',copy=False)
+        DEP2=pd.merge(DEP.rename(columns={'ENSMUSP': 'protein1'}), PPI, on='protein1', how='inner',copy=False)
+        DEP3=pd.merge(DEP2, DEP.rename(columns={'ENSMUSP': 'protein2'}), on='protein2', how='inner',copy=False)
         DEP_UP=DEP3[(DEP3['FC_x'] =="UP") & (DEP3['FC_y'] =="UP")]
         DEP_Down=DEP3[(DEP3['FC_x'] =="Down") & (DEP3['FC_y'] =="Down")]
 
@@ -638,7 +638,10 @@ if selected_option=="B, mRNA (protein)-mRNA (protein) interaction (transcriptome
         Pk10=pd.DataFrame([x1,y1]).T.rename(columns={0: 'k'}).rename(columns={1: 'P(k)'})
         Pk11=Pk10[Pk10["k"]>0]
         Pk12=Pk11[Pk11["P(k)"]>0]
-
+        
+        del DEP3
+        del PPI
+        gc.collect()
         #Network_UP
         G = nx.Graph()
         G.add_nodes_from(DEP_UP["Name_x"].unique(), bipartite=0)
@@ -850,9 +853,7 @@ if selected_option=="B, mRNA (protein)-mRNA (protein) interaction (transcriptome
             csv_zip.writestr("Decreased_protein-protein.csv",
                             Decreased_output.to_csv(index=True))                
         with open("protein-protein.zip", "rb") as file: 
-            st.download_button(label = "Download protein-protein data",data = file,file_name = "protein-protein.zip")
-        del PPI
-        gc.collect()                
+            st.download_button(label = "Download protein-protein data",data = file,file_name = "protein-protein.zip")              
     else:
         st.write("Please upload transciptome or proteome data (organ or cell).")
 
@@ -871,27 +872,25 @@ if selected_option=="C, metabolic network (including enzyme, mRNA, and metabolit
         CPDA=pd.read_csv("./Database/MetabolomeTable_AdditionalID.csv")
         
         #CPD diplicate
-        CPDA1=pd.merge(Meta1, CPDA, on='CPD', how='inner')
-        CPDA1=CPDA1[["CPD1","FC"]]
+        CPDA1=pd.merge(Meta1, CPDA, on='CPD', how='inner')[["CPD1","FC"]]
         CPDA1.rename(columns={'CPD1': 'CPD'}, inplace=True)
         Meta=pd.concat([Meta1,CPDA1]).reset_index(drop=True)
 
         #MMU only, metabolic pathway only
         BRENDA=pd.merge(Species[Species["MAP"]=="map01100"].rename(columns={"Molecule": 'Enzyme'}),
-                BRENDA, on='Enzyme', how='inner')
+                BRENDA, on='Enzyme', how='inner',copy=False)
         Meta_KEGG=pd.merge(Species[Species["MAP"]=="map01100"].rename(columns={"Molecule": 'Enzyme'}),
-                Meta_KEGG, on='Enzyme', how='inner')
+                Meta_KEGG, on='Enzyme', how='inner',copy=False)
         Tran_KEGG=pd.merge(Species[Species["MAP"]=="map01100"].rename(columns={"Molecule": 'Enzyme'}),
-                Tran_KEGG, on='Enzyme', how='inner')
+                Tran_KEGG, on='Enzyme', how='inner',copy=False)
 
         #Connect (Metabolite/Transcript-Enzyme)
-        BRENDA2=pd.merge(BRENDA, Meta, on='CPD', how='inner')
-        BRENDA2["Regulation"]="Allosteric"
-        BRENDA3=BRENDA2.rename(columns={'CPD': 'Molecule'})
-        Subpro=pd.merge(Meta_KEGG, Meta, on='CPD', how='inner').rename(columns={'CPD': 'Molecule'})
+        BRENDA3=pd.merge(BRENDA, Meta, on='CPD', how='inner',copy=False).rename(columns={'CPD': 'Molecule'})
+        BRENDA3["Regulation"]="Allosteric"
+        Subpro=pd.merge(Meta_KEGG, Meta, on='CPD', how='inner',copy=False).rename(columns={'CPD': 'Molecule'})
         ALL=pd.concat([BRENDA3, Subpro])
-        Tran_KEGG2=pd.merge(Tran_KEGG, Tran, on='ENSMUSG', how='inner')
-        Tran_KEGG3=Tran_KEGG2.drop("mmu", axis=1).rename(columns={'ENSMUSG': 'Molecule'})
+        Tran_KEGG3=pd.merge(Tran_KEGG, Tran, on='ENSMUSG', how='inner',copy=False)
+        Tran_KEGG3=Tran_KEGG3.drop("mmu", axis=1).rename(columns={'ENSMUSG': 'Molecule'})
         Tran_KEGG3["Regulation"]="Transcript"
         ALL=pd.concat([ALL, Tran_KEGG3])
         ALL=ALL.reset_index(drop=True)
@@ -1225,7 +1224,11 @@ if selected_option=="C, metabolic network (including enzyme, mRNA, and metabolit
         Pk=pd.DataFrame([x,y]).T.rename(columns={0: 'k'}).rename(columns={1: 'P(k)'})
         Pk1=Pk[Pk["k"]>0]
         Pk2=Pk1[Pk1["P(k)"]>0]
-
+        del BRENDA
+        del Output_ALL1
+        del Database_ALL
+        gc.collect() 
+        
         #Uploaded data
         G1 = nx.Graph()
         G1.add_nodes_from(ALL["Name"].unique(), bipartite=0)
@@ -1485,9 +1488,9 @@ if selected_option=="C, metabolic network (including enzyme, mRNA, and metabolit
                                 output3.to_csv(index=False))
             with open("mRNAmetabolite-Enzyme.zip", "rb") as file: 
                 st.download_button(label = "Download mRNAmetabolite-Enzyme data",data = file,file_name = "mRNAmetabolite-Enzyme.zip")
-        del BRENDA
-        del Output_ALL1
-        del Database_ALL
+        del Meta_KEGG2
+        del Meta_KEGG
+        del Tran_KEGG
         gc.collect()    
     else:
         st.write("Please upload metabolome (organ or cell) and transciptome data (organ or cell).")
@@ -1501,7 +1504,7 @@ if selected_option=="D, metabolic network (including transporter, mRNA, and meta
         Meta_blood_Old=Meta_blood.copy()
 
         Name=pd.read_csv("./Database/230228Molecule2Name.csv")
-        CPD=pd.read_csv("./Database/230228CPD2Transporter.csv")
+        #CPD=pd.read_csv("./Database/230228CPD2Transporter.csv")
         ENSMUSG=pd.read_csv("./Database/230228ENSMUSG2Transporter.csv")
         CPDA=pd.read_csv("./Database/MetabolomeTable_AdditionalID.csv")
         Family=pd.read_csv("./Database/230228TransporterFamily.csv")
@@ -1518,14 +1521,14 @@ if selected_option=="D, metabolic network (including transporter, mRNA, and meta
         Meta_blood=pd.concat([Meta_blood,CPDA1]).reset_index(drop=True)
 
         #Connect (Metabolite/Transcript-Transporter)
-        OrganMeta=pd.merge(CPD,Meta, on='CPD', how='inner')
+        OrganMeta=pd.merge(pd.read_csv("./Database/230228CPD2Transporter.csv"),Meta, on='CPD', how='inner',copy=False)
         OrganMeta.rename(columns={'CPD': 'Molecule'}, inplace=True)
         OrganMeta=pd.merge(OrganMeta,Name, on='Molecule', how='inner')
         OrganMeta["Molecule"]='Organ_' + OrganMeta['Molecule'].astype(str)
         OrganMeta["Regulation"]="Organ"
-        BloodMeta=pd.merge(CPD,Meta_blood, on='CPD', how='inner')
+        BloodMeta=pd.merge(pd.read_csv("./Database/230228CPD2Transporter.csv"),Meta_blood, on='CPD', how='inner',copy=False)
         BloodMeta.rename(columns={'CPD': 'Molecule'}, inplace=True)
-        BloodMeta=pd.merge(BloodMeta,Name, on='Molecule', how='inner')
+        BloodMeta=pd.merge(BloodMeta,Name, on='Molecule', how='inner',copy=False)
         BloodMeta["Molecule"]='Blood_' + BloodMeta['Molecule'].astype(str)
         BloodMeta["Regulation"]="Blood"
         OrganTran=pd.merge(ENSMUSG,Tran, on='ENSMUSG', how='inner')
@@ -1695,8 +1698,10 @@ if selected_option=="D, metabolic network (including transporter, mRNA, and meta
         ax1.axis('off')
         ax1.view_init(7, 10)
 
-        Meta_Old2=pd.merge(CPD,Meta_Old, on='CPD', how='inner')
-        Meta_blood_Old2=pd.merge(CPD,Meta_blood_Old, on='CPD', how='inner')
+        Meta_Old2=pd.merge(pd.read_csv("./Database/230228CPD2Transporter.csv"),Meta_Old, 
+                           on='CPD', how='inner',copy=False)
+        Meta_blood_Old2=pd.merge(pd.read_csv("./Database/230228CPD2Transporter.csv"),Meta_blood_Old,
+                                 on='CPD', how='inner',copy=False)
 
         ax1.text(-2.5,2.0,1.8,"Transporter mRNA ("+"I:"+str(Regulation["Increased"][0])+', D:'+str(Regulation["decreased"][0])+')',
                 fontname="Arial",color="white",fontsize=9)
@@ -1819,7 +1824,8 @@ if selected_option=="D, metabolic network (including transporter, mRNA, and meta
                             Num[(Num['OrganTran_number'] ==0) & (Num['BloodMeta_number'] == 0)& (Num['OrganMeta_number'] > 0)].to_csv(index=False))                   
         with open("Transporter.zip", "rb") as file: 
             st.download_button(label = "Download transporter data",data = file,file_name = "Transporter.zip")
-
+        del ALL
+        gc.collect()
         #Upload
         degree1 = list(dict(nx.degree(G1)).values())
         x1 = [i for i in range(max(degree1)+1)]
@@ -1829,16 +1835,16 @@ if selected_option=="D, metabolic network (including transporter, mRNA, and meta
         Pk12=Pk11[Pk11["P(k)"]>0]
 
         #Database
-        CPD1=CPD.copy()
+        CPD1=pd.read_csv("./Database/230228CPD2Transporter.csv")
         CPD1["CPD"]='Organ_' + CPD1['CPD'].astype(str)
-        CPD2=pd.concat([CPD,CPD1])
-        CPD3=CPD2.rename(columns={'CPD': 'Molecule'})
-        Datab=pd.concat([CPD3,ENSMUSG])
+        CPD1=pd.concat([pd.read_csv("./Database/230228CPD2Transporter.csv"),CPD1])
+        CPD1=CPD1.rename(columns={'CPD': 'Molecule'})
+        CPD1=pd.concat([CPD1,ENSMUSG])
 
         Gd = nx.Graph()
-        Gd.add_nodes_from(Datab["Molecule"].unique())
-        Gd.add_nodes_from(Datab["Transporter"].unique())
-        edge_lists=[tuple(x) for x in Datab[["Molecule","Transporter"]].values]
+        Gd.add_nodes_from(CPD1["Molecule"].unique())
+        Gd.add_nodes_from(CPD1["Transporter"].unique())
+        edge_lists=[tuple(x) for x in CPD1[["Molecule","Transporter"]].values]
         Gd.add_edges_from(edge_lists)
         degree = list(dict(nx.degree(Gd)).values())
         x = [i for i in range(max(degree)+1)]
@@ -1889,7 +1895,7 @@ if selected_option=="D, metabolic network (including transporter, mRNA, and meta
         
         f=open('./Fig/D5.txt', 'r')
         st.write(f.read())
-        del CPD
+        del CPD1
         del CPDA1
         gc.collect()                       
     else:
