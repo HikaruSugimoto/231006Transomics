@@ -193,11 +193,11 @@ if selected_option=="A, gene regulatory network (including TF, miRNA, and mRNA) 
         P = pd.DataFrame([], columns=['TF', 'p','list'], index=range(len(TF)))           
         for i in range (0,len(TF)):
             #DEG
-            Cuery=pd.merge(Scores[['Name',str(i)]],Tran3_UP, how="inner", on = "Name")
+            Cuery=pd.merge(Scores[['Name',str(i)]],Tran3_UP, how="inner", on = "Name",copy=False)
             Cuery_hit=Cuery[str(i)]>=Thre
             P["list"][i]=Cuery[Cuery[str(i)]>=Thre]["Name"].values
             #Background
-            Cuery_ref=pd.merge(Scores[['Name',str(i)]],df_ref, how="inner", on = "Name")
+            Cuery_ref=pd.merge(Scores[['Name',str(i)]],df_ref, how="inner", on = "Name",copy=False)
             Cuery_refhit=Cuery_ref[str(i)]>=Thre
             res = fisher_exact([[Cuery_hit.sum(),Cuery_refhit.sum()],
                                     [len(Tran3_UP)-Cuery_hit.sum(), len(df_ref)-Cuery_refhit.sum()]], 
@@ -219,11 +219,11 @@ if selected_option=="A, gene regulatory network (including TF, miRNA, and mRNA) 
         P = pd.DataFrame([], columns=['TF', 'p','list'], index=range(len(TF))) 
         for i in range (0,len(TF)):
             #DEG
-            Cuery=pd.merge(Scores[['Name',str(i)]],Tran3_Down, how="inner", on = "Name")
+            Cuery=pd.merge(Scores[['Name',str(i)]],Tran3_Down, how="inner", on = "Name",copy=False)
             Cuery_hit=Cuery[str(i)]>=Thre
             P["list"][i]=Cuery[Cuery[str(i)]>=Thre]["Name"].values
             #Background
-            Cuery_ref=pd.merge(Scores[['Name',str(i)]],df_ref, how="inner", on = "Name")
+            Cuery_ref=pd.merge(Scores[['Name',str(i)]],df_ref, how="inner", on = "Name",copy=False)
             Cuery_refhit=Cuery_ref[str(i)]>=Thre
             res = fisher_exact([[Cuery_hit.sum(),Cuery_refhit.sum()],
                                     [len(Tran3_Down)-Cuery_hit.sum(), len(df_ref)-Cuery_refhit.sum()]], alternative='greater')
@@ -239,7 +239,7 @@ if selected_option=="A, gene regulatory network (including TF, miRNA, and mRNA) 
         Q=pd.DataFrame([q[1]]).T
         P=pd.concat([P,Q],axis=1)
         Q3_Down=P[P[0]<FDR][['TF', 'p','list',0]].rename(columns={0: 'Q'})
-        
+        del Scores
         #TF
         Q3_UP["Regulation"]="UP"
         Q3_Down["Regulation"]="Down"
