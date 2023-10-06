@@ -105,7 +105,7 @@ options = ['cyan','blue','green','red','magenta','yellow','black','white']
 Inc_color = st.sidebar.selectbox('Increased color:',options)
 options = ['red','blue','green','cyan','magenta','yellow','black','white']
 Dec_color = st.sidebar.selectbox('Decreased color:',options)
-options1 = ['Liver', 'Muscle','Pluripotent stem cell', 'Unclassified', 'Blood', 'Embryo',
+options1 = ['Liver', 'Muscle','All', 'Pluripotent stem cell', 'Unclassified', 'Blood', 'Embryo',
        'Gonad', 'No description', 'Neural','Embryonic fibroblast', 'Digestive tract', 'Kidney',
        'Cardiovascular', 'Pancreas', 'Lung', 'Spleen', 'Bone','Others', 'Uterus', 'Breast', 
        'Epidermis', 'Prostate', 'Adipocyte','Placenta']
@@ -152,13 +152,6 @@ if selected_option=="A, gene regulatory network (including TF, miRNA, and mRNA) 
         Name=pd.read_csv("./Database/230228Molecule2Name.csv")
         miRNA=pd.read_csv("./Database/230424mmu_miRNA_Gene.csv")
         miRNA=miRNA.drop_duplicates(subset=['Name', 'miRNA'])
-        #Scores=pd.concat([pd.read_csv("./Database/230228ChipScore1.csv", dtype="int16"),
-        #        pd.read_csv("./Database/230228ChipScore2.csv", dtype="int16"),
-        #        pd.read_csv("./Database/230228ChipScore3.csv", dtype="int16"),
-        #        pd.read_csv("./Database/230228ChipScore4.csv", dtype="int16"),
-        #        pd.read_csv("./Database/230228ChipScore5.csv", dtype="int16"),
-        #        pd.read_csv("./Database/230228ChipScore6.csv", dtype="int16")],axis=0).reset_index(drop=True)
-        #Scores=pd.concat([pd.read_csv("./Database/230228Genename.csv"),Scores],axis=1)
         @st.cache_data
         def TFmiRNA_estimation():
             Scores=pd.concat([pd.read_csv("./Database/230228ChipScore1.csv", dtype="int16"),
@@ -169,7 +162,7 @@ if selected_option=="A, gene regulatory network (including TF, miRNA, and mRNA) 
                     pd.read_csv("./Database/230228ChipScore6.csv", dtype="int16")],axis=0).reset_index(drop=True)
             Scores=pd.concat([pd.read_csv("./Database/230228Genename.csv"),Scores],axis=1)   
             return Scores
-        Scores=TFmiRNA_estimation()          
+        Scores=TFmiRNA_estimation()            
         exp=pd.read_csv("./Database/230228experimentList_mm10.csv")[["Var4","Var5"]]
         TF=pd.read_csv("./Database/230228TF.csv")
         
@@ -239,6 +232,7 @@ if selected_option=="A, gene regulatory network (including TF, miRNA, and mRNA) 
         Q=pd.DataFrame([q[1]]).T
         P=pd.concat([P,Q],axis=1)
         Q3_Down=P[P[0]<FDR][['TF', 'p','list',0]].rename(columns={0: 'Q'})
+        
         del Scores
         #TF
         Q3_UP["Regulation"]="UP"
@@ -363,7 +357,10 @@ if selected_option=="A, gene regulatory network (including TF, miRNA, and mRNA) 
         HtmlFile = open("TFmiRNA-mRNA.html", 'r')
         components.html(HtmlFile.read(), height=900)
         st.download_button(label="Download the interactice network",data=open("TFmiRNA-mRNA.html", 'r'),
-                        file_name="TFmiRNA-mRNA.html")   
+                        file_name="TFmiRNA-mRNA.html")
+        del TFmiRNAmRNAcopy
+        del TFmiRNAmRNA
+        del TFmiRNAmRNA1  
     else:
         st.write("Please upload transciptome data (organ or cell).")
 
@@ -609,6 +606,7 @@ if selected_option=="B, mRNA (protein)-mRNA (protein) interaction (transcriptome
                             Decreased_output.to_csv(index=True))                
         with open("mRNA-mRNA.zip", "rb") as file: 
             st.download_button(label = "Download mRNA-mRNA data",data = file,file_name = "mRNA-mRNA.zip")
+        del PPI 
             
     if Pro is not None:
         st.subheader('B, Protein-protein interaction')
@@ -849,7 +847,7 @@ if selected_option=="B, mRNA (protein)-mRNA (protein) interaction (transcriptome
                             Decreased_output.to_csv(index=True))                
         with open("protein-protein.zip", "rb") as file: 
             st.download_button(label = "Download protein-protein data",data = file,file_name = "protein-protein.zip")
-                        
+        del PPI                
     else:
         st.write("Please upload transciptome or proteome data (organ or cell).")
 
@@ -1482,7 +1480,9 @@ if selected_option=="C, metabolic network (including enzyme, mRNA, and metabolit
                                 output3.to_csv(index=False))
             with open("mRNAmetabolite-Enzyme.zip", "rb") as file: 
                 st.download_button(label = "Download mRNAmetabolite-Enzyme data",data = file,file_name = "mRNAmetabolite-Enzyme.zip")
-                  
+        del BRENDA
+        del Output_ALL1
+        del Database_ALL      
     else:
         st.write("Please upload metabolome (organ or cell) and transciptome data (organ or cell).")
      
@@ -1882,7 +1882,9 @@ if selected_option=="D, metabolic network (including transporter, mRNA, and meta
         st.pyplot(fig) 
         
         f=open('./Fig/D5.txt', 'r')
-        st.write(f.read())                      
+        st.write(f.read())
+        del CPD
+        del CPDA1                       
     else:
         st.write("Please upload metabolome (organ or cell), metabolome (blood or medium) and transciptome data (organ or cell).")
         
