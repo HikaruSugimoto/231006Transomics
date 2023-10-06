@@ -26,6 +26,7 @@ import statsmodels.stats.multitest as multi
 from matplotlib_venn import venn3
 from PIL import Image
 import statsmodels.api as sm
+import gc
 plt.rcParams['font.family']= 'sans-serif'
 plt.rcParams['font.sans-serif'] = ['Arial']
 plt.rcParams['xtick.direction'] = 'out'
@@ -234,6 +235,7 @@ if selected_option=="A, gene regulatory network (including TF, miRNA, and mRNA) 
         Q3_Down=P[P[0]<FDR][['TF', 'p','list',0]].rename(columns={0: 'Q'})
         
         del Scores
+        gc.collect()
         #TF
         Q3_UP["Regulation"]="UP"
         Q3_Down["Regulation"]="Down"
@@ -360,7 +362,8 @@ if selected_option=="A, gene regulatory network (including TF, miRNA, and mRNA) 
                         file_name="TFmiRNA-mRNA.html")
         del TFmiRNAmRNAcopy
         del TFmiRNAmRNA
-        del TFmiRNAmRNA1  
+        del TFmiRNAmRNA1
+        gc.collect()  
     else:
         st.write("Please upload transciptome data (organ or cell).")
 
@@ -606,7 +609,8 @@ if selected_option=="B, mRNA (protein)-mRNA (protein) interaction (transcriptome
                             Decreased_output.to_csv(index=True))                
         with open("mRNA-mRNA.zip", "rb") as file: 
             st.download_button(label = "Download mRNA-mRNA data",data = file,file_name = "mRNA-mRNA.zip")
-        del PPI 
+        del PPI
+        gc.collect()
             
     if Pro is not None:
         st.subheader('B, Protein-protein interaction')
@@ -847,7 +851,8 @@ if selected_option=="B, mRNA (protein)-mRNA (protein) interaction (transcriptome
                             Decreased_output.to_csv(index=True))                
         with open("protein-protein.zip", "rb") as file: 
             st.download_button(label = "Download protein-protein data",data = file,file_name = "protein-protein.zip")
-        del PPI                
+        del PPI
+        gc.collect()                
     else:
         st.write("Please upload transciptome or proteome data (organ or cell).")
 
@@ -1482,7 +1487,8 @@ if selected_option=="C, metabolic network (including enzyme, mRNA, and metabolit
                 st.download_button(label = "Download mRNAmetabolite-Enzyme data",data = file,file_name = "mRNAmetabolite-Enzyme.zip")
         del BRENDA
         del Output_ALL1
-        del Database_ALL      
+        del Database_ALL
+        gc.collect()    
     else:
         st.write("Please upload metabolome (organ or cell) and transciptome data (organ or cell).")
      
@@ -1884,7 +1890,8 @@ if selected_option=="D, metabolic network (including transporter, mRNA, and meta
         f=open('./Fig/D5.txt', 'r')
         st.write(f.read())
         del CPD
-        del CPDA1                       
+        del CPDA1
+        gc.collect()                       
     else:
         st.write("Please upload metabolome (organ or cell), metabolome (blood or medium) and transciptome data (organ or cell).")
         
