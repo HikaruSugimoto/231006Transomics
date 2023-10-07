@@ -233,7 +233,7 @@ if selected_option=="A, gene regulatory network (including TF, miRNA, and mRNA) 
         Q=pd.DataFrame([q[1]]).T
         P=pd.concat([P,Q],axis=1)
         Q3_Down=P[P[0]<FDR][['TF', 'p','list',0]].rename(columns={0: 'Q'})
-        
+        st.cache_data.clear()
         del Scores
         del exp
         gc.collect()
@@ -1897,7 +1897,8 @@ if selected_option=="D, metabolic network (including transporter, mRNA, and meta
         st.write(f.read())
         del CPD1
         del CPDA1
-        gc.collect()                       
+        gc.collect()
+        st.stop()                       
     else:
         st.write("Please upload metabolome (organ or cell), metabolome (blood or medium) and transciptome data (organ or cell).")
         
